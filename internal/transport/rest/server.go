@@ -1,0 +1,31 @@
+package rest
+
+import (
+	"errors"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+type HttpServerShortener struct {
+	HttpHandlers HttpHandlersShortener
+}
+
+func NewHttpServerShortener(httpHandlers HttpHandlersShortener) HttpServerShortener {
+	return HttpServerShortener{
+		HttpHandlers: httpHandlers,
+	}
+}
+
+func (h HttpServerShortener) Start() error {
+	router := mux.NewRouter()
+
+	router.Path("/s/{short_url}").Methods("GET").HandlerFunc(h.HttpHandlers.HandleRedirectByShortUrl)
+	router.Path("/shorten").Methods("POST").HandlerFunc(h.HttpHandlers.HandleCreateShortUrl)
+
+	err := http.ListenAndServe("localhost:8000", router)
+	if errors.Is(err, http.ErrServerClosed) {
+		return nil
+	}
+	return err
+}

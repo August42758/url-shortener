@@ -3,13 +3,16 @@ package main
 import (
 	"fmt"
 
+	"urlShortener/internal/config"
 	"urlShortener/internal/repository"
 	"urlShortener/internal/service"
 	"urlShortener/internal/transport/rest"
 )
 
 func main() {
-	repositoryShortener := repository.NewRepositoryShortener()
+	config.LoadConfig()
+
+	repositoryShortener := repository.NewRepositoryShortenerPostgres()
 	serviceShortener := service.NewServiceShortener(repositoryShortener)
 	httpHandlersShortener := rest.NewHttpHandlersShortener(serviceShortener)
 

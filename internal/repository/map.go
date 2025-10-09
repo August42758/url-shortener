@@ -1,16 +1,16 @@
 package repository
 
-type RepositoryShortener struct {
+type RepositoryShortenerMap struct {
 	storage map[string]string
 }
 
-func NewRepositoryShortener() RepositoryShortener {
-	return RepositoryShortener{
+func NewRepositoryShortenerMap() RepositoryShortenerMap {
+	return RepositoryShortenerMap{
 		storage: map[string]string{},
 	}
 }
 
-func (u *RepositoryShortener) AddUrl(shortUrl, originalUrl string) error {
+func (u *RepositoryShortenerMap) AddUrl(shortUrl, originalUrl string) error {
 	if _, ok := u.storage[shortUrl]; ok {
 		return ErrUrlAlreadyExists
 	}
@@ -20,7 +20,7 @@ func (u *RepositoryShortener) AddUrl(shortUrl, originalUrl string) error {
 	return nil
 }
 
-func (u *RepositoryShortener) GetOriginalUrl(shortUrl string) (string, error) {
+func (u *RepositoryShortenerMap) GetOriginalUrl(shortUrl string) (string, error) {
 	if _, ok := u.storage[shortUrl]; !ok {
 		return "", ErrUrlNotFound
 	}

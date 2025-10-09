@@ -7,10 +7,10 @@ import (
 )
 
 type ServiceShortener struct {
-	repository repository.RepositoryShortener
+	repository repository.RepositoryShortenerIntreface
 }
 
-func NewServiceShortener(repository repository.RepositoryShortener) ServiceShortener {
+func NewServiceShortener(repository repository.RepositoryShortenerIntreface) ServiceShortener {
 	return ServiceShortener{
 		repository: repository,
 	}

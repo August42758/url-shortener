@@ -4,6 +4,8 @@ import (
 	"errors"
 	"net/http"
 
+	"urlShortener/internal/config"
+
 	"github.com/gorilla/mux"
 )
 
@@ -23,7 +25,7 @@ func (h HttpServerShortener) Start() error {
 	router.Path("/s/{short_url}").Methods("GET").HandlerFunc(h.HttpHandlers.HandleRedirectByShortUrl)
 	router.Path("/shorten").Methods("POST").HandlerFunc(h.HttpHandlers.HandleCreateShortUrl)
 
-	err := http.ListenAndServe("localhost:8000", router)
+	err := http.ListenAndServe(config.AppConfig.ServerAddres, router)
 	if errors.Is(err, http.ErrServerClosed) {
 		return nil
 	}

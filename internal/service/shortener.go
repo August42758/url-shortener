@@ -3,6 +3,7 @@ package service
 import (
 	"math/rand"
 
+	"urlShortener/internal/database"
 	"urlShortener/internal/repository"
 )
 
@@ -40,4 +41,19 @@ func (s ServiceShortener) genShortUrl() string {
 		shortUrl += string(availableSymbols[rand.Intn(len(availableSymbols))])
 	}
 	return shortUrl
+}
+
+func (s ServiceShortener) IncreaseRedirectCount(shortUrl string) error {
+	if err := s.repository.IncreaseRedirectCount(shortUrl); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s ServiceShortener) GetUrlInfo(shortUrl string) (database.UrlInfo, error) {
+	urlInfo, err := s.repository.GetUrlInfo(shortUrl)
+	if err != nil {
+		return database.UrlInfo{}, err
+	}
+	return urlInfo, nil
 }

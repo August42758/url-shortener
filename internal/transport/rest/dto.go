@@ -49,3 +49,18 @@ func (e ErrorDTO) ToString() string {
 
 	return string(b)
 }
+
+// response dto
+type UrlInfoDTO struct {
+	ShortUrl      string `json:"short_url"`
+	OriginalUrl   string `json:"original_url"`
+	RedirectCount int    `json: "redirect_count"`
+}
+
+func NewUrlInfoDto(shortUrl string, originalUrl string, redirectCount int) UrlInfoDTO {
+	return UrlInfoDTO{
+		ShortUrl:      shortUrl,
+		OriginalUrl:   originalUrl,
+		RedirectCount: redirectCount,
+	}
+}

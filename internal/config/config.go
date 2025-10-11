@@ -4,6 +4,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const IsDebug bool = false
+
 type Config struct {
 	DbConnect struct {
 		Username string `mapstructure:"username"`
@@ -17,7 +19,12 @@ type Config struct {
 var AppConfig Config
 
 func LoadConfig() {
-	viper.AddConfigPath("./internal/config")
+	if IsDebug {
+		viper.AddConfigPath("../../internal/config")
+	} else {
+		viper.AddConfigPath("./internal/config")
+	}
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("yaml")
 

@@ -58,14 +58,43 @@ func (h *HttpHandlersShortener) HandleCreateShortUrl(w http.ResponseWriter, r *h
 func (h HttpHandlersShortener) HandleRedirectByShortUrl(w http.ResponseWriter, r *http.Request) {
 	defer catchPanic("HandlerRedirectByShortUrl")
 
-	shortUrlPathParametr := mux.Vars(r)["short_url"]
+	shortUrl := mux.Vars(r)["short_url"]
 
-	originalUrl, err := h.service.GetOriginalUrl(shortUrlPathParametr)
+	originalUrl, err := h.service.GetOriginalUrl(shortUrl)
 	if err != nil {
 		errorDTO := NewErrorDTO(err)
 		http.Error(w, errorDTO.ToString(), http.StatusNotFound)
 		return
 	}
 
+	if err := h.service.IncreaseRedirectCount(shortUrl); err != nil {
+		errorDTO := NewErrorDTO(err)
+		http.Error(w, errorDTO.ToString(), http.StatusNotFound)
+		return
+	}
+
 	http.Redirect(w, r, originalUrl, http.StatusTemporaryRedirect)
+}
+
+func (h HttpHandlersShortener) HandleGetUrlInfo(w http.ResponseWriter, r *http.Request) {
+	defer catchPanic("HandnleGetUrlInfo")
+
+	shortUrl := mux.Vars(r)["short_url"]
+
+	urlInfoModel, err := h.service.GetUrlInfo(shortUrl)
+	if err != nil {
+		errorDTO := NewErrorDTO(err)
+		http.Error(w, errorDTO.ToString(), http.StatusNotFound)
+		return
+	}
+
+	urlInfoDTO := NewUrlInfoDto(urlInfoModel.ShortUrl, urlInfoModel.OriginalUrl, urlInfoModel.RedirectCount)
+
+	b, err := json.Marshal(&urlInfoDTO)
+	if err != nil {
+		panic(err)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
 }

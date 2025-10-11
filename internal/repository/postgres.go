@@ -46,3 +46,31 @@ func (r RepositoryShortenerPostgres) GetOriginalUrl(shortUrl string) (string, er
 
 	return originalUrl, nil
 }
+
+func (r RepositoryShortenerPostgres) IncreaseRedirectCount(shortUrl string) error {
+	var redirectCount int
+	if err := r.db.QueryRow("SELECT redirect_count FROM urls WHERE short_url = $1", shortUrl).Scan(&redirectCount); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return ErrUrlNotFound
+		} else {
+			panic(err)
+		}
+	}
+
+	redirectCount += 1
+	r.db.Exec("UPDATE urls SET redirect_count = $1 WHERE short_url = $2", redirectCount, shortUrl)
+
+	return nil
+}
+
+func (r RepositoryShortenerPostgres) GetUrlInfo(shortUrl string) (database.UrlInfo, error) {
+	urlInfo := database.NEwUrlInfo()
+	if err := r.db.QueryRow("SELECT * FROM urls WHERE short_url = $1", shortUrl).Scan(&urlInfo.Id, &urlInfo.ShortUrl, &urlInfo.OriginalUrl, &urlInfo.RedirectCount); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return database.UrlInfo{}, ErrUrlNotFound
+		} else {
+			panic(err)
+		}
+	}
+	return urlInfo, nil
+}

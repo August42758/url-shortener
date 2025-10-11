@@ -24,6 +24,7 @@ func (h HttpServerShortener) Start() error {
 
 	router.Path("/s/{short_url}").Methods("GET").HandlerFunc(h.HttpHandlers.HandleRedirectByShortUrl)
 	router.Path("/shorten").Methods("POST").HandlerFunc(h.HttpHandlers.HandleCreateShortUrl)
+	router.Path("/analytycs/{short_url}").Methods("GET").HandlerFunc(h.HttpHandlers.HandleGetUrlInfo)
 
 	err := http.ListenAndServe(config.AppConfig.ServerAddres, router)
 	if errors.Is(err, http.ErrServerClosed) {

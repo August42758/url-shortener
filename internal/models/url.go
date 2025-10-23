@@ -1,12 +1,12 @@
-package database
+package models
 
-type UrlInfo struct {
+type Url struct {
 	Id            int
 	ShortUrl      string
 	OriginalUrl   string
 	RedirectCount int
 }
 
-func NEwUrlInfo() UrlInfo {
-	return UrlInfo{}
+func NewUrl() *Url {
+	return &Url{}
 }

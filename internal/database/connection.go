@@ -8,17 +8,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func ConnectDB() *sql.DB {
+func ConnectDB() (*sql.DB, error) {
 	db, err := sql.Open("postgres", GetDbAddres())
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	if err := db.Ping(); err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
 
 func GetDbAddres() string {

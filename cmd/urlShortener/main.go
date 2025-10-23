@@ -1,23 +1,38 @@
 package main
 
 import (
-	"fmt"
-
+	"log"
+	"net/http"
+	"os"
 	"urlShortener/internal/config"
-	"urlShortener/internal/repository"
-	"urlShortener/internal/service"
+	"urlShortener/internal/database"
+	"urlShortener/internal/models"
 	"urlShortener/internal/transport/rest"
 )
 
 func main() {
 	config.LoadConfig()
 
-	repositoryShortener := repository.NewRepositoryShortenerPostgres()
-	serviceShortener := service.NewServiceShortener(repositoryShortener)
-	httpHandlersShortener := rest.NewHttpHandlersShortener(serviceShortener)
+	ErrLogger := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	InfoLogger := log.New(os.Stderr, "INFO\t", log.Ldate|log.Ltime)
 
-	httpServer := rest.NewHttpServerShortener(httpHandlersShortener)
-	if err := httpServer.Start(); err != nil {
-		fmt.Println(err)
+	db, err := database.ConnectDB()
+	if err != nil {
+		ErrLogger.Fatal(err)
+	}
+
+	urlModel := models.NewUrlModelPostgres(db)
+	Shortener := rest.NewShortener(urlModel, ErrLogger, InfoLogger)
+
+	InfoLogger.Println("Запуск сервера:", config.AppConfig.ServerAddres)
+
+	server := http.Server{
+		Handler:  Shortener.SetRoutes(),
+		ErrorLog: ErrLogger,
+		Addr:     config.AppConfig.ServerAddres,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
+		ErrLogger.Fatal(err)
 	}
 }

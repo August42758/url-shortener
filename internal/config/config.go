@@ -13,6 +13,11 @@ type Config struct {
 		Addres   string `mapstructure:"addres"`
 		Name     string `mapstructure:"name"`
 	} `mapstructure:"db_connect"`
+	RedisConnect struct {
+		Addres   string `mapstructure:"addres"`
+		Password string `mapstructure:"password"`
+		Db       int    `mapstructure:"db"`
+	} `mapstructure:"redis_connect"`
 	ServerAddres string `mapstructure:"server_addres"`
 }
 

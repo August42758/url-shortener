@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"os"
+	"urlShortener/internal/cache"
 	"urlShortener/internal/config"
 	"urlShortener/internal/database"
 	"urlShortener/internal/models"
@@ -21,8 +23,13 @@ func main() {
 		ErrLogger.Fatal(err)
 	}
 
+	redis, err := cache.NewRedisClient(context.Background())
+	if err != nil {
+		ErrLogger.Fatal(err)
+	}
+
 	urlModel := models.NewUrlModelPostgres(db)
-	Shortener := rest.NewShortener(urlModel, ErrLogger, InfoLogger)
+	Shortener := rest.NewShortener(redis, urlModel, ErrLogger, InfoLogger)
 
 	InfoLogger.Println("Запуск сервера:", config.AppConfig.ServerAddres)
 

@@ -1,10 +1,12 @@
 package rest
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"net/http"
+	"time"
 	"urlShortener/internal/models"
 )
 
@@ -79,6 +81,10 @@ func (s *Shortener) HandleRedirectByShortUrl(w http.ResponseWriter, r *http.Requ
 		s.ErrorLogger.Println(err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
+	}
+
+	if err := s.Redis.Set(context.Background(), shortUrl, originalUrl, 30*time.Minute).Err(); err != nil {
+		s.ErrorLogger.Println(err)
 	}
 
 	http.Redirect(w, r, originalUrl, http.StatusTemporaryRedirect)
